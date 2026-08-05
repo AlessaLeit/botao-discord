@@ -3,6 +3,8 @@ import os
 import sqlite3
 from dotenv import load_dotenv
 from discord.ext import commands, tasks
+from flask import Flask
+from threading import Thread
 
 # Carrega as variáveis do arquivo .env para o ambiente
 load_dotenv()
@@ -13,6 +15,18 @@ DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 if not DISCORD_TOKEN:
     print("Erro: O token do Discord não foi encontrado. Verifique suas variáveis de ambiente.")
     exit()
+
+# --- Configuração do Servidor Web para Manter o Bot Ativo (Keep-Alive) ---
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Estou vivo!"
+
+def run_web_server():
+  # Executa o servidor Flask na porta 8080
+  app.run(host='0.0.0.0', port=8080)
+
 
 # --- Configuração do Bot ---
 # O 'intents' informa ao Discord quais tipos de eventos nosso bot quer receber.
@@ -39,6 +53,10 @@ async def verificar_lembretes():
     # 2. Enviar uma mensagem no canal para cada lembrete encontrado.
     # 3. Marcar o lembrete como "enviado" no banco de dados.
     print("Verificando lembretes...") # Apenas para depuração
+
+# Inicia o servidor web em uma thread separada
+web_thread = Thread(target=run_web_server)
+web_thread.start()
 
 # Inicia a execução do bot
 bot.run(DISCORD_TOKEN)
