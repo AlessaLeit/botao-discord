@@ -9,6 +9,11 @@ load_dotenv()
 
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
+# Verificação de segurança: Garante que o bot não tente iniciar sem um token.
+if not DISCORD_TOKEN:
+    print("Erro: O token do Discord não foi encontrado. Verifique suas variáveis de ambiente.")
+    exit()
+
 # --- Configuração do Bot ---
 # O 'intents' informa ao Discord quais tipos de eventos nosso bot quer receber.
 intents = discord.Intents.default()
